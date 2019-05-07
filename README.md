@@ -1,44 +1,65 @@
+# Solution
+
+## Structure
 Routes defined in app/conf/routes, application controller in app/controllers/VenueController.
 
 The application can be started by executing:
+```
 > sbt run
+```
 in project folder. 
 By default, it will be started at localhost:9000, to start it on 8080, please use: 
-sbt "run 8080"
+```
+> sbt "run 8080"
+```
 
+## Test
 Example flow on Windows (needed \" to work in a Cmdr...) 
-
+```
 > curl http://localhost:9000/venues
+```
 []
-
+```
 > curl -XPUT -H "Content-Type: application/json" http://localhost:9000/venue/1 -d "{\"name\":\"Rynek Glowny\",\"price\":1000}" 
+```
 1
-
+```
 > curl http://localhost:9000/venues
+```
 [{"id":"1","name":"Rynek Glowny","price":1000,"owner":null}]
-
+```
 > curl -XPUT -H "Content-Type: application/json" http://localhost:9000/venue/2 -d "{\"name\":\"Krzemienica\",\"price\":100}" 
+```
 2
-
+```
 > curl http://localhost:9000/venues
+```
 [{"id":"2","name":"Krzemienica","price":100,"owner":null},{"id":"1","name":"Rynek Glowny","price":1000,"owner":null}]
-
+```
 > curl -XDELETE http://localhost:9000/venues/2
+```
 2
-
+```
 > curl http://localhost:9000/venues
+```
 [{"id":"1","name":"Rynek Glowny","price":1000,"owner":null}]
 
+```
 > curl -XPOST -H "Content-Type: application/json" http://localhost:9000/venue/2/buy -d "{\"playerId\":\"player2\"}" 
+```
 There is no venue with the following id: 2
-
+```
 > curl -XPOST -H "Content-Type: application/json" http://localhost:9000/venue/1/buy -d "{\"playerId\":\"player1\"}"
+```
 player1 can't afford Rynek Glowny
 
+```
 > curl -XPOST -H "Content-Type: application/json" http://localhost:9000/venue/1/buy -d "{\"playerId\":\"player2\"}"  
+```
 Rynek Glowny was bought by player2 for 1000
-
+```
 > curl http://localhost:9000/venues
+```
 [{"id":"1","name":"Rynek Glowny","price":1000,"owner":"player2"}]
 
 
