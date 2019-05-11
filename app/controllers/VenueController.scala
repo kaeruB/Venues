@@ -10,19 +10,12 @@ import play.api.libs.functional.syntax._
 
 class VenueController  @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
-  implicit val venueWrites = new Writes[Venue] {
-    def writes(venue : Venue) = Json.obj(
-      "id" -> venue.id,
-        "name" -> venue.name,
-        "price" -> venue.price,
-        "owner" -> getOwnerOrNull(venue.owner)
-    )
-  }
+  implicit val venueWrites: OWrites[Venue] = Json.writes[Venue]
 
   implicit val venueReads: Reads[Venue] = (
     (__ \ "name").read[String] and
     (__ \ "price").read[Int]
-  )(Venue.apply _)
+  )(Venue.apply(null, _, _))
 
   implicit val playerIdReads: Reads[String] = (__ \ "playerId").read[String]
 
@@ -32,40 +25,59 @@ class VenueController  @Inject()(cc: ControllerComponents) extends AbstractContr
 
   def putVenue(id: String) = Action { implicit request =>
     val venue = Json.fromJson[Venue](request.body.asJson.get).get
-    venue.id = id
+    val newVenue: Venue = Venue (
+      id = id,
+      name = venue.name,
+      price = venue.price
+    )
 
-    if (venueExists(id)) Database.venues = Database.venues.filter(_.id != id)
-    Database.venues = venue :: Database.venues
+    val venueToUpdate: Option[Venue] = if (Database.venues.nonEmpty) Database.venues.find(_.id == id) else None
+    if (venueToUpdate.isDefined)
+      Database.venues = Database.venues.filter(x => x.id != id)
+    Database.venues = newVenue :: Database.venues
 
-    Ok(venue.id)
+    Ok(id)
   }
 
   def deleteVenue(id: String) = Action { implicit  request =>
     var venueToDeleteId = id
-    if (venueExists(id)) Database.venues = Database.venues.filter(_.id != id)
+    val venueToDelete: Option[Venue] = if (Database.venues.nonEmpty) Database.venues.find(_.id == id) else None
+    if (venueToDelete.isDefined)
+      Database.venues = Database.venues.filter(_ != venueToDelete.get)
     else venueToDeleteId = s"There is no venue with the following id: $id "
     Ok(venueToDeleteId)
   }
 
   def buyVenue(venueId: String) = Action { implicit request =>
     val playerId: String = playerIdReads.reads(request.body.asJson.get).get
-    val player: List[Player] = if (Database.players.nonEmpty) Database.players.filter(_.playerId == playerId) else List.empty
-    val venue: List[Venue] = if (Database.venues.nonEmpty) Database.venues.filter(_.id == venueId) else List.empty
+    val buyer: Option[Player] = if (Database.players.nonEmpty) Database.players.find(_.playerId == playerId) else None
+    val venue: Option[Venue] = if (Database.venues.nonEmpty) Database.venues.find(_.id == venueId) else None
+    val indexOfVenue: Option[Int] = if (venue.isDefined) Some(Database.venues.indexOf(venue.get)) else None
 
     var message = ""
-    if (player.isEmpty || venue.isEmpty) {
-      if (player.isEmpty)
+    if (buyer.isEmpty || venue.isEmpty) {
+      if (buyer.isEmpty)
         message = s"There is no player with the following id: $playerId"
       if (venue.isEmpty)
         message = s"There is no venue with the following id: $venueId "
     }
-    else if (TransactionsController.isRichEnough(player.head, venue.head)) {
-      player.head.money = player.head.money - venue.head.price
-      venue.head.owner = Option(player.head)
-      message = venue.head.name + s" was bought by $playerId for " + venue.head.price
+    else if (TransactionsController.isRichEnough(buyer.get, venue.get)) {
+      buyer.get.money = buyer.get.money - venue.get.price
+
+      val updatedVenue = Venue (
+        name = venue.get.name,
+        price = venue.get.price,
+        id = venue.get.id,
+        owner = Some(playerId)
+      )
+
+      Database.venues = Database.venues.filter(x => x.id != venueId)
+      Database.venues = updatedVenue :: Database.venues
+
+      message = venue.get.name + s" was bought by $playerId for " + venue.head.price
     }
     else {
-      message = s"$playerId can't afford " + venue.head.name
+      message = s"$playerId can't afford " + venue.get.name
     }
 
     Ok(message)
@@ -74,10 +86,5 @@ class VenueController  @Inject()(cc: ControllerComponents) extends AbstractContr
   def getOwnerOrNull(owner: Option[Player]): String = {
     if (owner.isDefined) return owner.get.playerId
     null
-  }
-
-  def venueExists(id: String): Boolean = {
-    if (Database.venues.exists(_.id == id)) return true
-    false
   }
 }

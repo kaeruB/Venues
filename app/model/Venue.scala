@@ -1,6 +1,3 @@
 package model
 
-case class Venue(name: String, price: Int) {
-  var id: String = _
-  var owner: Option[Player] = None
-}
+case class Venue(id: String = null, name: String, price: Int, owner: Option[String] = None)

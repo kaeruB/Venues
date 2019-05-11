@@ -1,11 +1,4 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
-
 GET     /venues                 controllers.VenueController.getVenues
-# curl -XPUT -H "Content-Type: application/json" http://localhost:9000/venue/7 -d "{\"name\":\"nyanchi\",\"price\":4}"
 PUT     /venue/:id              controllers.VenueController.putVenue(id: String)
-# curl -XDELETE http://localhost:9000/venues/7
 DELETE  /venues/:id             controllers.VenueController.deleteVenue(id: String)
-# curl -XPOST -H "Content-Type: application/json" -d "{\"playerId\":\"player1\"}" http://localhost:9000/venue/7/buy
 POST    /venue/:id/buy          controllers.VenueController.buyVenue(id: String)

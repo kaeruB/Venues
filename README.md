@@ -26,7 +26,7 @@ Example flow on Windows (needed \" to work in a Cmdr...)
 ```
 > curl http://localhost:9000/venues
 ```
-[{"id":"1","name":"Rynek Glowny","price":1000,"owner":null}]
+[{"id":"1","name":"Rynek Glowny","price":1000}]
 ```
 > curl -XPUT -H "Content-Type: application/json" http://localhost:9000/venue/2 -d "{\"name\":\"Krzemienica\",\"price\":100}" 
 ```
@@ -34,7 +34,7 @@ Example flow on Windows (needed \" to work in a Cmdr...)
 ```
 > curl http://localhost:9000/venues
 ```
-[{"id":"2","name":"Krzemienica","price":100,"owner":null},{"id":"1","name":"Rynek Glowny","price":1000,"owner":null}]
+[{"id":"2","name":"Krzemienica","price":100},{"id":"1","name":"Rynek Glowny","price":1000}]
 ```
 > curl -XDELETE http://localhost:9000/venues/2
 ```
@@ -42,7 +42,7 @@ Example flow on Windows (needed \" to work in a Cmdr...)
 ```
 > curl http://localhost:9000/venues
 ```
-[{"id":"1","name":"Rynek Glowny","price":1000,"owner":null}]
+[{"id":"1","name":"Rynek Glowny","price":1000}]
 
 ```
 > curl -XPOST -H "Content-Type: application/json" http://localhost:9000/venue/2/buy -d "{\"playerId\":\"player2\"}" 
