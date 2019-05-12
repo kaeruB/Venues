@@ -3,6 +3,8 @@
 ## Structure
 Routes defined in app/conf/routes, application controller in app/controllers/VenueController.
 
+
+## Execution
 The application can be started by executing:
 ```
 > sbt run
@@ -13,7 +15,16 @@ By default, it will be started at localhost:9000, to start it on 8080, please us
 > sbt "run 8080"
 ```
 
-## Test
+## Business logic tests
+
+### Unit tests
+
+To run unit tests:
+```
+> sbt test
+```
+
+### User tests
 Example flow on Windows (needed \" to work in a Cmdr...) 
 ```
 > curl http://localhost:9000/venues
