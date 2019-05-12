@@ -9,16 +9,18 @@ object Game {
   }
 
   def addVenue(venueId: String, venueWithoutId: Venue): Unit = {
-    val newVenue: Venue = Venue (
-      id = venueId,
-      name = venueWithoutId.name,
-      price = venueWithoutId.price
-    )
+    this.synchronized {
+      val newVenue: Venue = Venue(
+        id = venueId,
+        name = venueWithoutId.name,
+        price = venueWithoutId.price
+      )
 
-    val venueToUpdate: Option[Venue] = if (Database.venues.nonEmpty) Database.venues.find(_.id == venueId) else None
-    if (venueToUpdate.isDefined)
-      Database.venues = Database.venues.filter(x => x.id != venueId)
-    Database.venues = newVenue :: Database.venues
+      val venueToUpdate: Option[Venue] = if (Database.venues.nonEmpty) Database.venues.find(_.id == venueId) else None
+      if (venueToUpdate.isDefined)
+        Database.venues = Database.venues.filter(x => x.id != venueId)
+      Database.venues = newVenue :: Database.venues
+    }
   }
 
   def deleteVenue(id: String): String = {
