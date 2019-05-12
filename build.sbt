@@ -7,6 +7,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       guice,
       "com.typesafe.play" %% "play" % "2.7.0",
-      "io.lemonlabs" %% "scala-uri" % "1.4.4"
+      "io.lemonlabs" %% "scala-uri" % "1.4.4",
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
     )
   )

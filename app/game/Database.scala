@@ -4,7 +4,7 @@ import model.{Player, Venue}
 
 object Database {
   var venues : List[Venue] = List.empty
-  val players : List[Player] = populatePlayersList()
+  var players : List[Player] = populatePlayersList()
 
   def populatePlayersList() : List[Player] = {
     val p1 = Player("player1")
